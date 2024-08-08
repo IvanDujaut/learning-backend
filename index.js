@@ -4,7 +4,7 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 
 const app = express();
-const PORT = 8080; // o el puerto que estés usando
+const PORT = 8080;
 
 // Middleware para parsear el cuerpo de las solicitudes como JSON
 app.use(bodyParser.json());

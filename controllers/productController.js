@@ -16,7 +16,6 @@ export const getAllProducts = (req, res) => {
         const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
         res.json(products);
     } catch (error) {
-        console.error('Error al leer los productos:', error);
         res.status(500).send('Error al leer los productos');
     }
 };
@@ -32,7 +31,6 @@ export const getProductById = (req, res) => {
             res.status(404).send('Producto no encontrado');
         }
     } catch (error) {
-        console.error('Error al leer el producto:', error);
         res.status(500).send('Error al leer el producto');
     }
 };
@@ -46,7 +44,6 @@ export const addProduct = (req, res) => {
         fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
         res.status(201).json(newProduct);
     } catch (error) {
-        console.error('Error al agregar el producto:', error);
         res.status(500).send('Error al agregar el producto');
     }
 };
@@ -67,7 +64,6 @@ export const updateProduct = (req, res) => {
             res.status(404).send('Producto no encontrado');
         }
     } catch (error) {
-        console.error('Error al actualizar el producto:', error);
         res.status(500).send('Error al actualizar el producto');
     }
 };
@@ -85,7 +81,6 @@ export const deleteProduct = (req, res) => {
             res.status(404).send('Producto no encontrado');
         }
     } catch (error) {
-        console.error('Error al eliminar el producto:', error);
         res.status(500).send('Error al eliminar el producto');
     }
 };

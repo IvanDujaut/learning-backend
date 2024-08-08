@@ -19,7 +19,6 @@ export const createCart = (req, res) => {
         fs.writeFileSync(cartFilePath, JSON.stringify(carts, null, 2));
         res.status(201).json(newCart);
     } catch (error) {
-        console.error('Error al crear el carrito:', error);
         res.status(500).send('Error al crear el carrito');
     }
 };
@@ -35,7 +34,6 @@ export const getCartById = (req, res) => {
             res.status(404).send('Carrito no encontrado');
         }
     } catch (error) {
-        console.error('Error al leer el carrito:', error);
         res.status(500).send('Error al leer el carrito');
     }
 };
@@ -63,7 +61,6 @@ export const addProductToCart = (req, res) => {
             res.status(404).send('Carrito o producto no encontrado');
         }
     } catch (error) {
-        console.error('Error al agregar producto al carrito:', error);
         res.status(500).send('Error al agregar producto al carrito');
     }
 };
