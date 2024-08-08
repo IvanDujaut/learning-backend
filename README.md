@@ -59,6 +59,16 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu máquina local:
     GET /api/products/
     ```
 
+    **Parámetros de consulta**:
+    
+    - `limit` (opcional): Un número para limitar la cantidad de productos devueltos.
+
+    **Ejemplo de uso**:
+    
+    ```http
+    GET /api/products?limit=2
+    ```
+
 - **Obtener un producto por ID**
 
     ```http
