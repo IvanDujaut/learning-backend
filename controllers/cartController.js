@@ -67,3 +67,4 @@ export const addProductToCart = (req, res) => {
         res.status(500).send('Error al agregar producto al carrito');
     }
 };
+
