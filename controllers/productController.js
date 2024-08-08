@@ -24,7 +24,7 @@ export const getAllProducts = (req, res) => {
         res.json(products);
     } catch (error) {
         console.error('Error al leer los productos:', error);
-        res.status(500).send('Error al leer los productos');
+        res.status(500).json({ message: 'Error al leer los productos' });
     }
 };
 
@@ -36,11 +36,11 @@ export const getProductById = (req, res) => {
         if (product) {
             res.json(product);
         } else {
-            res.status(404).send('Producto no encontrado');
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
     } catch (error) {
         console.error('Error al leer el producto:', error);
-        res.status(500).send('Error al leer el producto');
+        res.status(500).json({ message: 'Error al leer el producto' });
     }
 };
 
@@ -51,10 +51,10 @@ export const addProduct = (req, res) => {
         newProduct.id = Date.now().toString();
         products.push(newProduct);
         fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
-        res.status(201).json(newProduct);
+        res.status(201).json({ message: 'Producto agregado con éxito', product: newProduct });
     } catch (error) {
         console.error('Error al agregar el producto:', error);
-        res.status(500).send('Error al agregar el producto');
+        res.status(500).json({ message: 'Error al agregar el producto' });
     }
 };
 
@@ -69,13 +69,13 @@ export const updateProduct = (req, res) => {
             const updatedProduct = { ...products[productIndex], ...updatedData, id: pid };
             products[productIndex] = updatedProduct;
             fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
-            res.json(updatedProduct);
+            res.json({ message: 'Producto actualizado con éxito', product: updatedProduct });
         } else {
-            res.status(404).send('Producto no encontrado');
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
     } catch (error) {
         console.error('Error al actualizar el producto:', error);
-        res.status(500).send('Error al actualizar el producto');
+        res.status(500).json({ message: 'Error al actualizar el producto' });
     }
 };
 
@@ -87,12 +87,12 @@ export const deleteProduct = (req, res) => {
 
         if (newProducts.length !== products.length) {
             fs.writeFileSync(productsFilePath, JSON.stringify(newProducts, null, 2));
-            res.status(204).send();
+            res.status(200).json({ message: 'Producto eliminado con éxito' });
         } else {
-            res.status(404).send('Producto no encontrado');
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
     } catch (error) {
         console.error('Error al eliminar el producto:', error);
-        res.status(500).send('Error al eliminar el producto');
+        res.status(500).json({ message: 'Error al eliminar el producto' });
     }
 };

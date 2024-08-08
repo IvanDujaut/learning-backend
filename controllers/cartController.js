@@ -17,9 +17,10 @@ export const createCart = (req, res) => {
         const carts = JSON.parse(fs.readFileSync(cartFilePath, 'utf-8'));
         carts.push(newCart);
         fs.writeFileSync(cartFilePath, JSON.stringify(carts, null, 2));
-        res.status(201).json(newCart);
+        res.status(201).json({ message: 'Carrito creado con éxito', cart: newCart });
     } catch (error) {
-        res.status(500).send('Error al crear el carrito');
+        console.error('Error al crear el carrito:', error);
+        res.status(500).json({ message: 'Error al crear el carrito' });
     }
 };
 
@@ -31,10 +32,11 @@ export const getCartById = (req, res) => {
         if (cart) {
             res.json(cart);
         } else {
-            res.status(404).send('Carrito no encontrado');
+            res.status(404).json({ message: 'Carrito no encontrado' });
         }
     } catch (error) {
-        res.status(500).send('Error al leer el carrito');
+        console.error('Error al leer el carrito:', error);
+        res.status(500).json({ message: 'Error al leer el carrito' });
     }
 };
 
@@ -58,10 +60,11 @@ export const addProductToCart = (req, res) => {
             fs.writeFileSync(cartFilePath, JSON.stringify(carts, null, 2));
             res.status(200).json(cart);
         } else {
-            res.status(404).send('Carrito o producto no encontrado');
+            res.status(404).json({ message: 'Carrito o producto no encontrado' });
         }
     } catch (error) {
-        res.status(500).send('Error al agregar producto al carrito');
+        console.error('Error al agregar producto al carrito:', error);
+        res.status(500).json({ message: 'Error al agregar producto al carrito' });
     }
 };
 
