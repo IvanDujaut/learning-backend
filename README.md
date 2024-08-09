@@ -1,13 +1,15 @@
 # Learning Backend
 
-Este proyecto es una API RESTful construida con Node.js y Express para gestionar productos y carritos de compra. Está diseñada para servir como un ejemplo educativo sobre cómo construir y manejar rutas, controladores y manejar archivos en un entorno backend.
+Este proyecto es una API RESTful construida con Node.js y Express para gestionar productos y carritos de compra, ahora extendida con WebSockets para actualizaciones en tiempo real. Está diseñada para servir como un ejemplo educativo sobre cómo construir y manejar rutas, controladores, manejar archivos en un entorno backend, y gestionar actualizaciones en tiempo real.
 
 ## Características
 
 - Gestión de productos: Crear, leer, actualizar y eliminar productos.
 - Gestión de carritos: Crear carritos y agregar productos a los carritos.
 - Persistencia de datos en archivos JSON.
-- Manejo de rutas y controladores utilizando Express.
+- Integración de WebSockets para actualizaciones en tiempo real de la lista de productos.
+- Uso de Handlebars como motor de plantillas para renderizar vistas dinámicas.
+- Modularización del código con separación de responsabilidades en controladores, rutas y manejo de WebSockets.
 
 ## Requisitos
 
@@ -147,9 +149,21 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu máquina local:
     }
     ```
 
+### Actualizaciones en Tiempo Real
+
+- **Ver productos en tiempo real**
+
+    ```http
+    GET /realtimeproducts
+    ```
+
+    Esta vista mostrará la lista de productos con actualizaciones en tiempo real utilizando WebSockets.
+
 ## Pruebas
 
 Puedes usar herramientas como Postman para probar los endpoints mencionados anteriormente. Asegúrate de que el servidor esté ejecutándose y utiliza las URLs y métodos HTTP adecuados para cada operación.
+
+Para probar las actualizaciones en tiempo real, abre la URL `http://localhost:8080/realtimeproducts` en tu navegador. Cuando agregues o elimines productos utilizando Postman o cualquier otra herramienta, la lista de productos en esta página se actualizará automáticamente.
 
 ## Estructura del Proyecto
 
@@ -163,11 +177,21 @@ learning-backend/
 │   └── products.json
 ├── routes/
 │   ├── cartRoutes.js
+│   ├── index.js
 │   └── productRoutes.js
+├── views/
+│   ├── layouts/
+│   │   └── main.handlebars
+│   ├── home.handlebars
+│   └── realTimeProducts.handlebars
 ├── .gitignore
+├── app.js
+├── config.js
 ├── index.js
 ├── package.json
 ├── package-lock.json
 ├── README.md
+├── server.js
+├── socketHandler.js
 └── utils.js
 
