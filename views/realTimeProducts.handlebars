@@ -1,0 +1,59 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Productos en Tiempo Real</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>Productos en Tiempo Real</h1>
+    <ul id="product-list">
+      {{#each products}}
+        <li>{{this.title}} - ${{this.price}}</li>
+      {{/each}}
+    </ul>
+
+    <script>
+        const socket = io(); // Conexión al servidor de WebSockets
+
+        // Escuchar el evento 'productUpdate' del servidor
+        socket.on('productUpdate', (products) => {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Limpiar la lista actual
+            products.forEach(product => {
+                const productElement = document.createElement('li');
+                productElement.id = `product-${product.id}`;
+                productElement.innerHTML = `
+                    <h2>${product.title}</h2>
+                    <p><strong>Descripción:</strong> ${product.description}</p>
+                    <p><strong>Precio:</strong> $${product.price}</p>
+                    <p><strong>Stock:</strong> ${product.stock} unidades</p>
+                `;
+                productList.appendChild(productElement);
+            });
+        });
+
+        // Escuchar el evento 'productAdded' del servidor
+        socket.on('productAdded', (product) => {
+            const productList = document.getElementById('product-list');
+            const productElement = document.createElement('li');
+            productElement.id = `product-${product.id}`;
+            productElement.innerHTML = `
+                <h2>${product.title}</h2>
+                <p><strong>Descripción:</strong> ${product.description}</p>
+                <p><strong>Precio:</strong> $${product.price}</p>
+                <p><strong>Stock:</strong> ${product.stock} unidades</p>
+            `;
+            productList.appendChild(productElement);
+        });
+
+        // Escuchar el evento 'productRemoved' del servidor
+        socket.on('productRemoved', (productId) => {
+            const productElement = document.getElementById(`product-${productId}`);
+            if (productElement) {
+                productElement.remove(); // Eliminar el producto de la lista
+            }
+        });
+    </script>
+  </body>
+</html>

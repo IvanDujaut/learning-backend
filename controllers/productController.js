@@ -2,8 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 const productsFilePath = path.join(process.cwd(), 'data', 'products.json');
-console.log(`Ruta del archivo de productos: ${productsFilePath}`);
-console.log(`Directorio actual de trabajo: ${process.cwd()}`);
 
 if (!fs.existsSync(productsFilePath)) {
     console.log('El archivo no existe, se va a crear.');
@@ -18,10 +16,10 @@ export const getAllProducts = (req, res) => {
 
         if (limit) {
             const limitedProducts = products.slice(0, Number(limit));
-            return res.json(limitedProducts);
+            return res.render('home', { products: limitedProducts });
         }
 
-        res.json(products);
+        res.render('home', { products });
     } catch (error) {
         console.error('Error al leer los productos:', error);
         res.status(500).json({ message: 'Error al leer los productos' });
@@ -51,6 +49,10 @@ export const addProduct = (req, res) => {
         newProduct.id = Date.now().toString();
         products.push(newProduct);
         fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
+
+        // Emitir evento WebSocket al agregar producto
+        req.io.emit('productAdded', newProduct);
+
         res.status(201).json({ message: 'Producto agregado con éxito', product: newProduct });
     } catch (error) {
         console.error('Error al agregar el producto:', error);
@@ -87,6 +89,10 @@ export const deleteProduct = (req, res) => {
 
         if (newProducts.length !== products.length) {
             fs.writeFileSync(productsFilePath, JSON.stringify(newProducts, null, 2));
+
+            // Emitir evento WebSocket al eliminar producto
+            req.io.emit('productRemoved', pid);
+
             res.status(200).json({ message: 'Producto eliminado con éxito' });
         } else {
             res.status(404).json({ message: 'Producto no encontrado' });
