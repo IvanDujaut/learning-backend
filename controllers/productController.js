@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import Joi from 'joi';
 
 const productsFilePath = path.join(process.cwd(), 'data', 'products.json');
 
@@ -42,33 +43,89 @@ export const getProductById = (req, res) => {
     }
 };
 
-export const addProduct = (req, res) => {
+export const addProduct = (newProduct, req, res) => {
+    // Asegurarse de que status e id estén definidos
+    newProduct.status = newProduct.status ?? true; // Asume true si no está definido
+    newProduct.id = newProduct.id ?? Date.now().toString(); // Genera un ID si no está definido
+
+    // Definir el esquema de validación
+    const productSchema = Joi.object({
+        title: Joi.string().min(3).required(),
+        description: Joi.string().min(10).required(),
+        code: Joi.string().alphanum().required(),
+        price: Joi.number().positive().required(),
+        stock: Joi.number().integer().min(0).required(),
+        category: Joi.string().required(),
+        thumbnails: Joi.array().items(Joi.string().uri({ allowRelative: true })).required(),
+        status: Joi.boolean().required(),
+        id: Joi.string().required()
+    });
+
+    // Validar el nuevo producto contra el esquema
+    const { error } = productSchema.validate(newProduct);
+
+    if (error) {
+        return res.status(400).json({ message: `Error en la validación: ${error.details[0].message}` });
+    }
+
     try {
-        const newProduct = req.body;
         const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-        newProduct.id = Date.now().toString();
+        console.log('Nuevo producto:', newProduct);
         products.push(newProduct);
         fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
 
         // Emitir evento WebSocket al agregar producto
-        req.io.emit('productAdded', newProduct);
+        if (req.io) {
+            req.io.emit('productAdded', newProduct);
+            // console.log('Evento productAdded emitido:', newProduct);
+        }
 
         res.status(201).json({ message: 'Producto agregado con éxito', product: newProduct });
     } catch (error) {
-        console.error('Error al agregar el producto:', error);
+        console.error('Error al agregar el producto:', error.message);
         res.status(500).json({ message: 'Error al agregar el producto' });
     }
 };
 
 export const updateProduct = (req, res) => {
+    const { pid } = req.params;
+    const updatedData = req.body;
+
+    // Definir el esquema de validación
+    const productSchema = Joi.object({
+        title: Joi.string().min(3),
+        description: Joi.string().min(10),
+        code: Joi.string().alphanum(),
+        price: Joi.number().positive(),
+        stock: Joi.number().integer().min(0),
+        category: Joi.string(),
+        thumbnails: Joi.array().items(Joi.string().uri({ allowRelative: true })),
+        status: Joi.boolean(),
+        id: Joi.string() // No es obligatorio en la actualización, pero se valida si se incluye
+    });
+
+    // Validar los datos actualizados contra el esquema
+    const { error } = productSchema.validate(updatedData);
+
+    if (error) {
+        return res.status(400).json({ message: `Error en la validación: ${error.details[0].message}` });
+    }
+
     try {
-        const { pid } = req.params;
-        const updatedData = req.body;
         const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
         const productIndex = products.findIndex(p => p.id === pid);
 
         if (productIndex !== -1) {
-            const updatedProduct = { ...products[productIndex], ...updatedData, id: pid };
+            const existingProduct = products[productIndex];
+
+            // Mantener status e id originales si no se proporcionan
+            const updatedProduct = {
+                ...existingProduct,
+                ...updatedData,
+                status: updatedData.status ?? existingProduct.status,
+                id: pid // Mantener el ID original
+            };
+
             products[productIndex] = updatedProduct;
             fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
             res.json({ message: 'Producto actualizado con éxito', product: updatedProduct });

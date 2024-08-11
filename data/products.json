@@ -8,8 +8,7 @@
     "stock": 50,
     "category": "Categoría de Prueba",
     "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
+      "/images/bag.jpg"
     ],
     "id": "1723138826515"
   },
@@ -22,8 +21,7 @@
     "stock": 50,
     "category": "Categoría de Prueba",
     "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
+      "/images/blue-shirt.jpg"
     ],
     "id": "1723138828604"
   },
@@ -36,65 +34,8 @@
     "stock": 50,
     "category": "Categoría de Prueba",
     "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
+      "/images/bracelet.jpg"
     ],
     "id": "1723138829632"
-  },
-  {
-    "title": "Producto de Prueba",
-    "description": "Descripción del producto de prueba",
-    "code": "P12345",
-    "price": 100,
-    "status": true,
-    "stock": 50,
-    "category": "Categoría de Prueba",
-    "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
-    ],
-    "id": "1723138830415"
-  },
-  {
-    "title": "Producto de Prueba",
-    "description": "Descripción del producto de prueba",
-    "code": "P12345",
-    "price": 100,
-    "status": true,
-    "stock": 50,
-    "category": "Categoría de Prueba",
-    "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
-    ],
-    "id": "1723138832312"
-  },
-  {
-    "title": "Producto de Prueba",
-    "description": "Descripción del producto de prueba",
-    "code": "P12345",
-    "price": 100,
-    "status": true,
-    "stock": 50,
-    "category": "Categoría de Prueba",
-    "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
-    ],
-    "id": "1723138832757"
-  },
-  {
-    "title": "Producto de Prueba",
-    "description": "Descripción del producto de prueba",
-    "code": "P12345",
-    "price": 100,
-    "status": true,
-    "stock": 50,
-    "category": "Categoría de Prueba",
-    "thumbnails": [
-      "ruta1.jpg",
-      "ruta2.jpg"
-    ],
-    "id": "1723138833289"
   }
 ]

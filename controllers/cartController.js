@@ -3,7 +3,7 @@ import path from 'path';
 
 const cartFilePath = path.join(process.cwd(), 'data', 'cart.json');
 const productsFilePath = path.join(process.cwd(), 'data', 'products.json');
-console.log(`Ruta del archivo de carritos: ${cartFilePath}`);
+// console.log(`Ruta del archivo de carritos: ${cartFilePath}`);
 
 if (!fs.existsSync(cartFilePath)) {
     console.log('El archivo de carritos no existe, se va a crear.');
