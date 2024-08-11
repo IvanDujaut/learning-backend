@@ -4,12 +4,12 @@ Este proyecto es una API RESTful construida con Node.js y Express para gestionar
 
 ## Características
 
-- Gestión de productos: Crear, leer, actualizar y eliminar productos.
-- Gestión de carritos: Crear carritos y agregar productos a los carritos.
-- Persistencia de datos en archivos JSON.
-- Integración de WebSockets para actualizaciones en tiempo real de la lista de productos.
-- Uso de Handlebars como motor de plantillas para renderizar vistas dinámicas.
-- Modularización del código con separación de responsabilidades en controladores, rutas y manejo de WebSockets.
+- **Gestión de productos:** Crear, leer, actualizar y eliminar productos con soporte para imágenes y atributos como `status` e `id`.
+- **Gestión de carritos:** Crear carritos y agregar productos a los carritos.
+- **Persistencia de datos:** Los productos y carritos se almacenan en archivos JSON.
+- **Actualizaciones en tiempo real:** Integración de WebSockets para actualizaciones en tiempo real de la lista de productos en la vista `realTimeProducts`.
+- **Renderizado dinámico:** Uso de Handlebars como motor de plantillas para renderizar vistas dinámicas.
+- **Modularización:** Código organizado con separación de responsabilidades en controladores, rutas y manejo de WebSockets.
 
 ## Requisitos
 
@@ -169,12 +169,18 @@ Para probar las actualizaciones en tiempo real, abre la URL `http://localhost:80
 
 ```plaintext
 learning-backend/
+├── config/
+│   ├── config.js
+│   └── uploadConfig.js
 ├── controllers/
 │   ├── cartController.js
 │   └── productController.js
 ├── data/
 │   ├── cart.json
 │   └── products.json
+├── public/
+│   ├── images/
+│   └── styles.css
 ├── routes/
 │   ├── cartRoutes.js
 │   ├── index.js
@@ -186,12 +192,9 @@ learning-backend/
 │   └── realTimeProducts.handlebars
 ├── .gitignore
 ├── app.js
-├── config.js
-├── index.js
 ├── package.json
 ├── package-lock.json
 ├── README.md
 ├── server.js
 ├── socketHandler.js
 └── utils.js
-
