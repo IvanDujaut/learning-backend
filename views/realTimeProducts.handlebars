@@ -3,57 +3,166 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Productos en Tiempo Real</title>
+    <link rel="stylesheet" href="/styles.css">
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
     <h1>Productos en Tiempo Real</h1>
-    <ul id="product-list">
+    <!-- Formulario para agregar un nuevo producto -->
+    <form id="product-form" action="/products" method="POST" enctype="multipart/form-data">
+      <input type="text" id="title" placeholder="Título" required>
+      <input type="text" id="description" placeholder="Descripción" required>
+      <input type="text" id="code" placeholder="Código" required>
+      <input type="number" id="price" placeholder="Precio" required>
+      <input type="number" id="stock" placeholder="Stock" required>
+      <input type="text" id="category" placeholder="Categoría" required>
+      <input type="file" id="thumbnails" multiple>
+      <button type="submit">Enviar</button>
+    </form>
+
+    <div id="product-list" class="product-list">
       {{#each products}}
-        <li>{{this.title}} - ${{this.price}}</li>
+        <div class="card" id="product-{{this.id}}">
+            <img src="{{this.thumbnails.[0]}}" alt="Imagen de {{this.title}}" class="product-image"/>
+            <div class="card-content">
+                <h2>{{this.title}}</h2>
+                <p><strong>Descripción:</strong> {{this.description}}</p>
+                <p><strong>Precio:</strong> ${{this.price}}</p>
+                <p><strong>Stock:</strong> {{this.stock}} unidades</p>
+                <p><strong>ID:</strong> {{this.id}}</p>
+                <p><strong>Status:</strong> {{#if this.status}}Activo{{else}}Inactivo{{/if}}</p>
+                <button onclick="removeProduct('{{this.id}}')">Eliminar Producto</button>
+            </div>
+        </div>
       {{/each}}
-    </ul>
+    </div>
 
     <script>
-        const socket = io(); // Conexión al servidor de WebSockets
+      const socket = io(); // Conexión al servidor de WebSockets
+      console.log('Intentando conectar al servidor de WebSocket');
 
-        // Escuchar el evento 'productUpdate' del servidor
-        socket.on('productUpdate', (products) => {
-            const productList = document.getElementById('product-list');
-            productList.innerHTML = ''; // Limpiar la lista actual
-            products.forEach(product => {
-                const productElement = document.createElement('li');
+      socket.on('connect', () => {
+          console.log('Conectado al servidor de WebSocket');
+      });
+
+      socket.on('connect_error', (error) => {
+          console.error('Error de conexión a WebSocket:', error);
+      });
+
+      // Manejar el envío del formulario
+      document.getElementById('product-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const code = document.getElementById('code').value;
+        const price = document.getElementById('price').value;
+        const stock = document.getElementById('stock').value;
+        const category = document.getElementById('category').value;
+
+        const thumbnails = document.getElementById('thumbnails').files;
+        const newProduct = {
+                title,
+                description,
+                code,
+                price: Number(price),
+                status: true, // Agregar el status por defecto
+                stock: Number(stock),
+                category,
+                thumbnails: [], // Aquí estarán las imágenes en base64
+                id: Date.now().toString() // Generar un ID único
+          };
+
+        let imagesProcessed = 0;
+
+        // Leer y subir imágenes
+        for (let i = 0; i < thumbnails.length; i++) {
+            const file = thumbnails[i];
+            const reader = new FileReader();
+
+            reader.onloadend  = function() {
+                newProduct.thumbnails.push(reader.result);
+                imagesProcessed++;
+
+                // Emitir el producto al servidor después de que todas las imágenes se hayan procesado
+                if (imagesProcessed === thumbnails.length) {
+                    socket.emit('productAdded', newProduct);
+                    // Limpiar el formulario
+                    document.getElementById('product-form').reset();
+                }
+            };
+
+            reader.readAsDataURL(file); // Leer el archivo como Data URL
+        }
+      });
+
+      // Función para eliminar un producto
+      function removeProduct(productId) {
+          socket.emit('productRemoved', productId);
+      }
+
+      // Escuchar el evento 'productUpdate' del servidor y renderizar las cards con los botones
+      socket.on('productUpdate', (products) => {
+          const productList = document.getElementById('product-list');
+          productList.innerHTML = ''; // Limpiar la lista actual
+          products.forEach(product => {
+              const productElement = document.createElement('div');
+              productElement.className = 'card';
+              productElement.id = `product-${product.id}`;
+              productElement.innerHTML = `
+                  <img src="${product.thumbnails[0]}" alt="Imagen de ${product.title}" class="product-image"/>
+                  <div class="card-content">
+                      <h2>${product.title}</h2>
+                      <p><strong>Descripción:</strong> ${product.description}</p>
+                      <p><strong>Precio:</strong> $${product.price}</p>
+                      <p><strong>Stock:</strong> ${product.stock} unidades</p>
+                      <p><strong>ID:</strong>${product.id}</p>
+                        <p><strong>Status:</strong> ${product.status}</p>
+                      <button onclick="removeProduct('${product.id}')">Eliminar Producto</button>
+                  </div>
+              `;
+              productList.appendChild(productElement);
+          });
+      });
+
+      // Escuchar el evento 'productAdded' del servidor
+      socket.on('productAdded', (product) => {
+        try {
+            const existingProduct = document.getElementById(`product-${product.id}`);
+            if (!existingProduct) {
+                const productList = document.getElementById('product-list');
+                const productElement = document.createElement('div');
+                productElement.className = 'card';
                 productElement.id = `product-${product.id}`;
+
+                const thumbnailSrc = (product.thumbnails && product.thumbnails.length > 0) ? product.thumbnails[0] : '/images/default-thumbnail.jpg';
+
                 productElement.innerHTML = `
-                    <h2>${product.title}</h2>
-                    <p><strong>Descripción:</strong> ${product.description}</p>
-                    <p><strong>Precio:</strong> $${product.price}</p>
-                    <p><strong>Stock:</strong> ${product.stock} unidades</p>
+                    <img src="${thumbnailSrc}" alt="Imagen de ${product.title}" class="product-image"/>
+                    <div class="card-content">
+                        <h2>${product.title}</h2>
+                        <p><strong>Descripción:</strong> ${product.description}</p>
+                        <p><strong>Precio:</strong> $${product.price}</p>
+                        <p><strong>Stock:</strong> ${product.stock} unidades</p>
+                        <p><strong>ID:</strong>${product.id}</p>
+                        <p><strong>Status:</strong> ${product.status}</p>
+                        <button onclick="removeProduct('${product.id}')">Eliminar Producto</button>
+                    </div>
                 `;
                 productList.appendChild(productElement);
-            });
-        });
-
-        // Escuchar el evento 'productAdded' del servidor
-        socket.on('productAdded', (product) => {
-            const productList = document.getElementById('product-list');
-            const productElement = document.createElement('li');
-            productElement.id = `product-${product.id}`;
-            productElement.innerHTML = `
-                <h2>${product.title}</h2>
-                <p><strong>Descripción:</strong> ${product.description}</p>
-                <p><strong>Precio:</strong> $${product.price}</p>
-                <p><strong>Stock:</strong> ${product.stock} unidades</p>
-            `;
-            productList.appendChild(productElement);
-        });
-
-        // Escuchar el evento 'productRemoved' del servidor
-        socket.on('productRemoved', (productId) => {
-            const productElement = document.getElementById(`product-${productId}`);
-            if (productElement) {
-                productElement.remove(); // Eliminar el producto de la lista
             }
-        });
+        } catch (error) {
+            console.error('Error procesando el producto en el cliente:', error);
+        }
+      });
+
+      // Escuchar el evento 'productRemoved' del servidor
+      socket.on('productRemoved', (productId) => {
+          const productElement = document.getElementById(`product-${productId}`);
+          if (productElement) {
+              productElement.remove();
+          }
+      });
     </script>
-  </body>
+</body>
 </html>

@@ -4,9 +4,10 @@ import { create } from 'express-handlebars';
 import path from 'path';
 import { __dirname } from './utils.js';
 import routes from './routes/index.js';
-import { config } from './config.js';
+import { config } from './config/config.js';
 
 const app = express();
+// console.log('app.js se ha cargado correctamente');
 
 // Configurar Handlebars como motor de plantillas
 const hbs = create({
@@ -26,5 +27,7 @@ app.use(express.static(path.join(__dirname, config.publicDir)));
 
 // Configurar las rutas
 app.use('/', routes);
+
+// console.log('Rutas configuradas correctamente');
 
 export default app;
